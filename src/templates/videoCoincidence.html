@@ -1,0 +1,24 @@
+<!-- Esta es la pantalla que se muestra cuando el usuario intenta añadir un video que ya había sido añadido por otro
+usuario anteriormente, informándole de ello. Simplemente se carga la lista de videos con el video que intentaba añadir el usuario y que ya
+se encontraba disponible en la plataforma-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Añadir Video</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% block cabecera %}
+        {% include "cabecera.html" %}
+    {% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<h2>Este video ya había sido añadido por otro usuario</h2>
+{% block videosList %}
+    {% include "videosList.html" %}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!-- Esta vista se muestra como paso previo a la eliminación de un video, para que el usuario
+confirme si verdaderamente va a eliminar el video y por lo tanto todos los comentarios asociados
+al mismo. En ella se presenta la lista de videos siendo esta conformada unicamente por el video
+que se va a eliminar. Además en esta pantalla se desactivan los botones de "dar like", "quitar like"
+y comentar el video-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Eliminar video</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+       document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('eliminarVideo').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</head>
+<body>
+{% block cabecera %}
+    {% include "cabecera.html" %}
+{% endblock %}
+{% block menu %}
+    {% include "menu.html" %}
+{% endblock %}
+{% block videosList %}
+    {% include "videosList.html" %}
+{% endblock %}
+<h2>Vas a eliminar este video, ¿estás seguro?</h2>
+<form id="eliminarVideo"
+          action="/eliminarVideo"
+          method="post">
+
+    <input type="hidden" name="url" id="url" value = "{{ url }}"/>
+    <button type="submit" name="confirmacion" value="si">Si</button>
+    <button type="submit" name="confirmacion" value="no">No</button>
+</form>
+</body>
+</html>

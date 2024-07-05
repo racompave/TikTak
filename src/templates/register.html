@@ -1,0 +1,51 @@
+<!-- Esta vista se muestra cuando el usuario va a registrarse en la plataforma. Incluye un formulario con los campos
+que debe rellenar el usuario para registrarse y un botón de "volver atras" con el que el usuario puede volver
+a la pagina de inicio-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Registrarse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% block cabeceraNoLogin %}
+    {% include "cabeceraNoLogin.html" %}
+{% endblock %}
+<form id="register"
+          action="/register"
+          onSubmit="return validateRegister();"
+          method="post">
+    <p>
+    Email : <input type="text"
+                    name="email"
+                    id="email"
+                    size="10"
+                    placeholder="email..."
+             />
+    <p>
+    Contraseña: <input type="password"
+                    name="password"
+                    id="password"
+                    size="10"
+                    placeholder="contraseña..."
+             />
+    <p>
+    Repetir contraseña: <input type="password"
+                    name="password2"
+                    id="password2"
+                    size="10"
+                    placeholder="repite contraseña..."
+             />
+    </p>
+    <input type="submit" value="Enviar">
+    </form>
+    <p>
+    <input type="button" class="goBack" onClick="javascript: window.location.href = '{{ url_for('get_index') }}'" value="Volver atrás">
+    <p>
+    {% block errorMessages %}
+        {% include "errorMessages.html" %}
+    {% endblock %}
+</body>
+</html>

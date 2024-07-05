@@ -1,0 +1,30 @@
+<!--Aquí se muestran los resultados de la búsqueda que haya realizado el usuario. Consta de la lista de videos con los videos
+han cumplido con los parametros que ha especificado el usuario en la búsqueda.-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Resultados de búsqueda</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% block cabecera %}
+        {% include "cabecera.html" %}
+    {% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<div id="dvResultadosBusqueda">
+     {% if videos_list|length == 1 %}
+        <h2>Se ha encontrado 1 video</h2>
+     {% else %}
+        <h2>Se han encontrado {{ videos_list|length }} videos</h2>
+     {% endif %}
+<input type="button" class="goBack" onClick="javascript:history.go(-1);" value="Volver atrás">
+     {% block videosList %}
+        {% include "videosList.html" %}
+     {% endblock %}
+</div>
+</body>
+</html>

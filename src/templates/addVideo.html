@@ -1,0 +1,60 @@
+<!-- Esta vista es la que se muestra cuando el usuario desea añadir un video a la plataforma.
+ Consta de un formulario en el que el usuario debe introducir la URL del video
+ a añadir, una descripción del mismo y clasificarlo en una categoría determinada.
+ (sólo se aceptaran URLs pertenecientes a las plataformas YouTube y DailyMotion)-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Añadir Video</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% block cabecera %}
+        {% include "cabecera.html" %}
+    {% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<p>
+<form id="addVideo"
+          action="{{ url_for('addVideo', user=email) }}"
+          method="post"
+          onSubmit="return validateAddVideo();">
+    <p>
+    URL : <input type="text"
+                    name="url"
+                    id="url"
+                    size="10"
+                    placeholder="url..."
+             />
+    <p>
+    Descripción:   <textarea
+                    class="descripcion"
+                    name="description"
+                    id="description"
+                    maxlength="200">
+                    </textarea>
+    </p>
+    <p>
+    Categoria: <select name="categoria" id="categoria">
+                    <option value="Animales">Animales</option>
+                    <option value="Deportes">Deportes</option>
+                    <option value="Graciosos">Graciosos</option>
+                    <option value="Naturaleza">Naturaleza</option>
+                    <option value="Música">Música</option>
+                    <option value="Tutoriales">Tutoriales</option>
+                    <option value="Videojuegos">Videjuegos</option>
+                    <option value="Otros">Otros</option>
+                </select>
+    </p>
+    <input type="submit" value="Añadir">
+    </form>
+    <p>
+    <p>
+    {% block errorMessages %}
+        {% include "errorMessages.html" %}
+    {% endblock %}
+</body>
+</html>

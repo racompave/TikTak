@@ -1,0 +1,25 @@
+<!-- Este es el menu de la aplicación. Se trata de un menu horizontal, con sus respectivos apartados, los cuales
+al ser pulsados nos redirigiran a las distintas vistas de la plataforma. Este fragmento de HTML se incluye en las distintas
+vistas de la aplicación-->
+
+<header class="menu">
+    <nav>
+        <ul>
+            <li>
+                <a href="{{ url_for('start', user=email) }}">Inicio</a>
+            </li>
+            <li>
+                <a href="{{ url_for('addVideo', user=email) }}">Añadir video</a>
+            </li>
+            <li>
+                <a href="{{ url_for('searchVideos', user=email) }}">Buscar videos</a>
+            </li>
+            <li>
+                <a href="{{ url_for('myVideos', user=email) }}">Mis videos</a>
+            </li>
+            <li>
+                <a href="{{ url_for('likedVideos', user=email) }}">Videos que me gustan</a>
+            </li>
+        </ul>
+    </nav>
+</header>

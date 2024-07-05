@@ -1,0 +1,27 @@
+<!-- En esta vista se la lista de videos está conformada por los distintos videos que el usuario activo ha subido hasta ese
+momento a la plataforma. En esta vista es en la única en la que se puede realizar la eliminación de tus videos.-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Mis videos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% block cabecera %}
+        {% include "cabecera.html" %}
+    {% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<div id="dvMisVideos">
+     {% if not videos_list %}
+        <h2>Añade algún video!</h2>
+     {% endif %}
+     {% block videosList %}
+        {% include "videosList.html" %}
+     {% endblock %}
+</div>
+</body>
+</html>

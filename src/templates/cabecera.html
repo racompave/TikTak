@@ -1,0 +1,14 @@
+<!-- Esta es la cabecera de la plataforma una vez el usuario se ha logueado
+con éxito en ella-->
+
+<header class="cabecera">
+    <div class ="parte_izquierda">
+        <h2>Usuario: {{email}}.</h2>
+        <form id="logout" action="/logout" method="post">
+            <input type="submit" value="Cerrar sesión">
+        </form>
+    </div>
+    <div class="parte_central">
+        <h1>TIKTAK</h1>
+    </div>
+</header>

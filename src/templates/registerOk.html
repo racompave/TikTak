@@ -1,0 +1,19 @@
+<!-- Esta vista se muestra cuando el usuario ha conseguido registrarse satisfactoriamente y se le avisa de ello-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Registrarse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% block cabeceraNoLogin %}
+    {% include "cabeceraNoLogin.html" %}
+{% endblock %}
+<h1>Registro completado satisfactoriamente!</h1>
+<h2>Vuelve atras para loguearte y usar la plataforma</h2>
+<p>
+<input type="button" class="goBack" onClick="javascript: window.location.href = '{{ url_for('get_index') }}'" value="Volver atrás">
+</body>
+</html>

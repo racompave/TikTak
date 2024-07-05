@@ -1,0 +1,82 @@
+<!-- Esta vista se muestra al usuario cuando se dispone a buscar videos de la plataforma. Incluye un formulario
+con diversos campos que el usuario puede rellenar, aunque esto es opcional, y de no especificar estos campos, simplemente
+se realizará la busqueda ignorando los campos no rellenados.-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Buscar videos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% block cabecera %}
+    {% include "cabecera.html" %}
+{% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<form id="searchVideos"
+          action="{{ url_for('searchResults', user=email) }}"
+          method="post">
+    <p>
+    Autor : <input type="text"
+                    name="autor"
+                    id="autor"
+                    size="10"
+                    placeholder="autor..."
+             />
+    <p>
+    Min. Visualizaciones: <input type="number"
+                    name="visualizaciones"
+                    id="visualizaciones"
+                    size="10"
+                    min="0"
+                    value="0"
+             />
+    <p>
+    Min. Likes: <input type="number"
+                    name="likes"
+                    id="likes"
+                    size="10"
+                    min="0"
+                    value="0"
+             />
+    <p>
+    Min. Comentarios: <input type="number"
+                    name="comentarios"
+                    id="comentarios"
+                    size="10"
+                    min="0"
+                    value="0"
+             />
+    <p>
+    Desde fecha: <input type="date"
+                    name="fecha"
+                    id="fecha"
+                    size="10"
+             />
+    <p>
+    Categoria: <select name="categoria" id="categoria">
+                    <option value="--Sin especificar--">--Sin especificar--</option>
+                    <option value="Animales">Animales</option>
+                    <option value="Deportes">Deportes</option>
+                    <option value="Graciosos">Graciosos</option>
+                    <option value="Naturaleza">Naturaleza</option>
+                    <option value="Música">Música</option>
+                    <option value="Tutoriales">Tutoriales</option>
+                    <option value="Videojuegos">Videjuegos</option>
+                    <option value="Otros">Otros</option>
+                </select>
+    <p>
+    Ordenar por número de: <select name="orden" id="orden">
+                    <option value="--Sin especificar--">--Sin especificar--</option>
+                    <option value="Visualizaciones">Visualizaciones</option>
+                    <option value="Likes">Likes</option>
+                    <option value="Comentarios">Comentarios</option>
+                </select>
+    </p>
+    <input type="submit" value="Buscar">
+    </form>
+</body>
+</html>

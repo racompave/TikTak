@@ -1,0 +1,350 @@
+<!-- Este documento de HTML es el correspondiente a la lista de videos. Con el podemos cargar en pantalla todos los videos
+que se necesiten según el caso, incluyendo además numerosas funciones con las que modificar el DOM y todo lo
+relacionadas a los videos y comentarios. Se incluye en múltiples vistas de la plataforma.-->
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ListaVideos</title>
+    <script>
+        /* Esta función se encarga de permitir gestionar en servidor el añadir un comentario a un video y de añadir al DOM el comentario que ha publicado el usuario.
+         Con preventDefault() evitamos que se recargue la página al enviar el formulario, luego cogemos por Id el propio formulario y el comentario
+         que se acaba de escribir. Enviamos por JSON a servidor el url del video previamente decodificado( lo codificamos en el HTML
+         para poder manipularlo con JavaScript, de otra forma no lo permite) y el valor del comentario escrito. La respuesta JSON que envia
+         el servidor con la ruta /comentarVideo permitirá actualizar el número de comentarios del video. Si este es el primer
+         comentario del video se añadirá a el y se hará desaparecer el mensaje que indicaba que no había comentarios.
+         Si ya había comentarios en el video, se añadirá al DOM en la sección de comentarios
+         encima de todos los comentarios anteriores( el que está más arriba es el comentario mas reciente ).
+         Finalmente el campo de texto donde figuraba el texto del comentario recien añadido se pone en blanco,
+         para facilitar el poder seguir añadiendo más comentarios al video.*/
+
+        function comentarVideo(encodedUrl){
+            event.preventDefault();
+            const form = document.getElementById(`commentForm-${encodedUrl}`);
+            const comentario = document.getElementById(`comentario-${encodedUrl}`).value;
+
+            fetch(`/comentarVideo`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: decodeURIComponent(encodedUrl), comentario: comentario })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                    document.getElementById(`ncomentarios-${encodedUrl}`).innerText = data.ncomentarios;
+                    const comentariosDiv = document.getElementById(`comentarios-${encodedUrl}`);
+                    let mensajeNoComentarios = document.getElementById(`mensajeNoComentarios`);
+                    if(mensajeNoComentarios){
+                        mensajeNoComentarios.remove();
+                    }
+                    const comentarioHTML = `
+                        <li id="comentario-${data.comentario.id}" class="comment">
+                            <span class="comment-author"><b>Autor:</b> ${data.comentario.autor}</span>
+                            <span class="comment-date"><b>Fecha:</b> ${data.comentario.fecha}</span>
+                            <p class="comment-text">${data.comentario.texto}</p>
+                            <button class="eliminarComentario" onclick="mostrarConfirmacionEliminarComentario('${data.comentario.id}');"
+                                        id="botonEliminarComentario-${data.comentario.id}" style="display: inline;">Eliminar comentario</button>
+
+                            <div id="confirmacionEliminarComentario-${data.comentario.id}" style="display: none;">
+                                    <b>Estas seguro?</b>
+                                    <button onclick="eliminarComentario('${encodedUrl}','${data.comentario.id}')">Si</button>
+                                    <button onclick="mostrarConfirmacionEliminarComentario('${data.comentario.id}');">No</button>
+                                </div>
+                        </li>
+                    `;
+                     comentariosDiv.innerHTML = comentarioHTML + comentariosDiv.innerHTML;
+
+                     const comentario = document.getElementById(`comentario-${data.comentario.id}`);
+
+                     const escapedEncodedUrl = CSS.escape(encodedUrl);
+                     form.querySelector(`#comentario-${escapedEncodedUrl}`).value = '';
+
+                }
+              })
+              .catch(error => console.error('Error:', error));
+        }
+
+        /* Esta función permite gestionar en servidor la eliminación de un comentario y
+        hacer desaparecer del DOM el comentario que el usuario ha elegido borrar. Se obtiene el comentario
+        a borrar mediante id del documento. Enviamos a servidor mediant JSON el url del video decodificado
+        y el id del comentario. Con la respuesta JSON del servidor modificamos el documento actualizando
+        el numero de comentarios del video y eliminamos el fragmento HTML del comentario mediante remove()*/
+
+        function eliminarComentario(encodedUrl, comentarioID){
+            const comentario = document.getElementById(`comentario-${comentarioID}`);
+            fetch(`/eliminarComentario`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: decodeURIComponent(encodedUrl), id: comentarioID })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  document.getElementById(`ncomentarios-${encodedUrl}`).innerText = data.ncomentarios;
+                  comentario.remove();
+                }
+              })
+              .catch(error => console.error('Error:', error));
+        }
+
+        /* Esta función permite gestionar en servidor el añadir una visualización a un video y
+        modificar el DOM para que se actualice el número de visualizaciones del video.
+        Enviamos a servidor mediant JSON el url del video decodificado.
+        Con la respuesta JSON del servidor modificamos el documento actualizando
+        el numero de visualizaciones del video*/
+
+        function incrementarVisualizacion(encodedUrl){
+              fetch(`/incrementar_visualizacion`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: decodeURIComponent(encodedUrl) })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  document.getElementById(`visualizaciones-${encodedUrl}`).innerText = data.newVisualizaciones;
+                }
+              })
+              .catch(error => console.error('Error:', error));
+        }
+
+        /* Esta función permite gestionar en servidor el añadir un like a un video y
+        modificar el DOM para que se actualice el número de likes del video.
+        Enviamos a servidor mediant JSON el url del video decodificado.
+        Con la respuesta JSON del servidor modificamos el documento actualizando
+        el numero de likes del video. Además llamamos a la función cambiarBotonLike(encodedUrl)
+        para cambiar el botón de "dar like" por el de "quitar like"*/
+
+        function incrementarLikes(encodedUrl){
+              fetch(`/incrementar_likes`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: decodeURIComponent(encodedUrl) })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  document.getElementById(`likes-${encodedUrl}`).innerText = data.newLikes;
+                  cambiarBotonLike(encodedUrl);
+                }
+              })
+              .catch(error => console.error('Error:', error));
+        }
+
+        /* Esta función permite gestionar en servidor el quitar un like a un video y
+        modificar el DOM para que se actualice el número de likes del video.
+        Enviamos a servidor mediant JSON el url del video decodificado.
+        Con la respuesta JSON del servidor modificamos el documento actualizando
+        el numero de likes del video. Además llamamos a la función cambiarBotonDislike(encodedUrl)
+        para cambiar el botón de "quitar like" por el de "dar like". Si se ejecuta
+        esta función en la pantalla de "Videos que me gustan" hará desaparecer el video
+        del DOM al detectar que existe el elemento "likedVideos", presente unicamente en el HTML "likedVideos.html"*/
+
+        function decrementarLikes(encodedUrl){
+              fetch(`/decrementar_likes`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: decodeURIComponent(encodedUrl) })
+              })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  document.getElementById(`likes-${encodedUrl}`).innerText = data.newLikes;
+                  cambiarBotonDislike(encodedUrl);
+                  if (document.getElementById('likedVideos').value === 'true') {
+                        quitarVideo(encodedUrl);
+                  }
+                }
+              })
+              .catch(error => console.error('Error:', error));
+        }
+
+        /*Esta función cambia el botón de "dar like" por el de "quitar like". Si un video
+         no tiene el like del usuario, en el DOM figurarán likeButton1 y dislikeButton2. De lo contrario figurarán likeButton2
+         y dislikeButton1. Si está función se ejecuta cambiará la visibilidad de uno de los dos botones "like" a "none"
+         y pondra la visibilidad de uno de los dos botones "dislike" a "inline". Se ha hecho con 4 botones, debido a la necesidad
+         de tener inicialmente visible o escondido un botón de like y un boton de dislike en función de si el usuario ha dado like al video
+         o no.*/
+
+        function cambiarBotonLike(encodedUrl){
+            likeButton1 = document.getElementById(`likeButton1-${encodedUrl}`);
+            likeButton2 = document.getElementById(`likeButton2-${encodedUrl}`);
+            dislikeButton1 = document.getElementById(`dislikeButton1-${encodedUrl}`);
+            dislikeButton2 = document.getElementById(`dislikeButton2-${encodedUrl}`);
+
+            if(likeButton1){
+              likeButton1.style.display = 'none';
+              dislikeButton2.style.display = 'inline';
+            }
+            else{
+              likeButton2.style.display = 'none';
+              dislikeButton1.style.display = 'inline';
+            }
+        }
+
+        /*Esta función cambia el botón de "quitar like" por el de "dar like". Si un video
+         tiene el like del usuario, en el DOM figurarán disLikeButton1 y likeButton2. De lo contrario figurarán disLikeButton2
+         y likeButton1. Si está función se ejecuta cambiará la visibilidad de uno de los dos botones "dislike" a "none"
+         y pondra la visibilidad de uno de los dos botones "like" a "inline". Se ha hecho con 4 botones, debido a la necesidad
+         de tener inicialmente visible o escondido un botón de like y un boton de dislike en función de si el usuario ha dado like al video
+         o no.*/
+
+        function cambiarBotonDislike(encodedUrl){
+            likeButton1 = document.getElementById(`likeButton1-${encodedUrl}`);
+            likeButton2 = document.getElementById(`likeButton2-${encodedUrl}`);
+            dislikeButton1 = document.getElementById(`dislikeButton1-${encodedUrl}`);
+            dislikeButton2 = document.getElementById(`dislikeButton2-${encodedUrl}`);
+
+            if(dislikeButton1){
+              likeButton2.style.display = 'inline';
+              dislikeButton1.style.display = 'none';
+            }
+            else{
+              likeButton1.style.display = 'inline';
+              dislikeButton2.style.display = 'none';
+            }
+        }
+
+        /* Permite quitar un video del DOM si el usuario le ha dado a "No me gusta" en la pantalla
+         de "Videos que me gustan" ya que no tendría sentido tenerlo ahí una vez el usuario le de a
+         "No me gusta"*/
+
+        function quitarVideo(encodedUrl){
+            let video = document.getElementById(`video-${encodedUrl}`);
+            if (video) {
+                video.remove();
+            }
+        }
+
+        /* Muestra el formulario para añadir un comentario cambiando su visibilidad a "block". Inicialmente
+         tiene una visibilidad de "none"*/
+
+        function mostrarFormComentario(encodedUrl){
+            let video = document.getElementById(`video-${encodedUrl}`);
+            if (video) {
+                commentForm = document.getElementById(`commentForm-${encodedUrl}`);
+                commentForm.style.display = 'block';
+            }
+        }
+
+        /*Muestra o esconde la confirmación de eliminar comentario. Si el usuario pulsa sobre "Eliminar comentario" se
+         muestra la confirmación cambiando su visibilidad a "inline" y escondiendo el boton de eliminar poniendo su visibilidad a "none".
+         Si el usuario pulsa sobre la opción "No" en la confirmación de eliminación esconde la confirmación de eliminación y vuelve
+         a mostrar el botón para eliminar el comentario.
+         */
+
+        function mostrarConfirmacionEliminarComentario(idComentario){
+            let comentario = document.getElementById(`comentario-${idComentario}`);
+            if(comentario){
+                botonEliminarComentario = document.getElementById(`botonEliminarComentario-${idComentario}`);
+                confirmacionEliminarComentario = document.getElementById(`confirmacionEliminarComentario-${idComentario}`);
+
+                if(botonEliminarComentario.style.display == 'none'){
+                    botonEliminarComentario.style.display = 'inline';
+                    confirmacionEliminarComentario.style.display = 'none';
+                }
+                else{
+                    botonEliminarComentario.style.display = 'none';
+                    confirmacionEliminarComentario.style.display = 'inline';
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+{% if videos_list %}
+    <ul class="listaVideos" id="listaVideos">
+        {% for video in videos_list %}
+            <ul class="video" id="video-{{ video.url | urlencode }}">
+                <hr>
+                <li><b>URL:</b> <a href="{{ video.url }}" target="_blank" onclick="incrementarVisualizacion('{{ video.url | urlencode }}');">{{ video.url }}</a></li>
+                <li><b>Autor:</b> {{ video.autor }}</li>
+                <li><b>Fecha de subida:</b> {{ video.time }}</li>
+                <li><b>Categoría:</b> {{ video.categoria }}</li>
+                <li><b>Visualizaciones:</b> <span id="visualizaciones-{{ video.url | urlencode }}"> {{ video.visualizaciones }}</span></li>
+                <li><b>Likes:</b> <span id="likes-{{ video.url | urlencode }}"> {{ video.nlikes }}</span></li>
+                <li><b>Comentarios :</b> <span id="ncomentarios-{{ video.url | urlencode }}">{{ video.ncomentarios }}</span></li>
+                <li><b>Descripción:</b> <span class="descripcion">{{ video.descripcion }}</span></li>
+                {% if not eliminarVideo %}
+                    {% if video.url not in liked_videos %}
+                        <button class="like1" id="likeButton1-{{ video.url | urlencode }}" onclick="incrementarLikes('{{ video.url | urlencode }}');" >Me gusta</button>
+                        <button class="dislike2" id="dislikeButton2-{{ video.url | urlencode }}" onclick="decrementarLikes('{{ video.url | urlencode }}');">No me gusta</button>
+                    {% else %}
+                        <button class="like2" id="likeButton2-{{ video.url | urlencode }}" onclick="incrementarLikes('{{ video.url | urlencode }}');">Me gusta</button>
+                        <button class="dislike1" id="dislikeButton1-{{ video.url | urlencode }}" onclick="decrementarLikes('{{ video.url | urlencode }}');">No me gusta</button>
+                    {% endif %}
+                    <button class="comentar" onclick="mostrarFormComentario('{{ video.url | urlencode }}')">Comentar</button>
+                {% endif %}
+                {% if myVideos %}
+                    <form class="eliminarVideo" id="eliminarVideo-{{ video.url | urlencode }}"
+                          action="{{ url_for('confirmarEliminarVideo', user=email) }}"
+                          method="post">
+                        <input type="hidden"
+                            name="url"
+                            id="url"
+                            value = "{{ video.url }}"
+                        />
+
+                        <button type="submit">Eliminar video</button>
+                    </form>
+                {% endif %}
+                <form class="comentario" id="commentForm-{{ video.url | urlencode }}" onsubmit="return validateAddComment('{{ video.url | urlencode }}');">
+                    <h3>Añade un comentario</h3><input type="text"
+                    name="comentario"
+                    id="comentario-{{ video.url | urlencode }}"
+                    maxlength="100"
+                    size="40"/>
+                    <button id="publicar" type="submit">Publicar</button>
+                </form>
+                <h3>Comentarios</h3>
+                <div class="comentarios {% if request.endpoint == 'confirmarEliminarVideo' %}shrink{% endif %}" id="comentarios-{{ video.url | urlencode }}">
+                {% if video.ncomentarios == 0 %}
+                    <p id="mensajeNoComentarios"><b>Aún no hay comentarios.</b></p>
+                {% else %}
+                    {% for comentario in comentarios_list|sort(attribute='fecha', reverse = True) %}
+                        {% if video.url == comentario.url %}
+                            <li id="comentario-{{ comentario.id }}" class="comment">
+                                <span class="comment-author"><b>Autor:</b> {{ comentario.autor }}</span>
+                                <span class="comment-date"><b>Fecha:</b> {{ comentario.fecha }}</span>
+                                <p class="comment-text">{{ comentario.texto }}</p>
+                                {% if not eliminarVideo %}
+                                    {% if email == comentario.autor or email == video.autor %}
+                                        <button class="eliminarComentario" onclick="mostrarConfirmacionEliminarComentario('{{ comentario.id }}');"
+                                                id="botonEliminarComentario-{{ comentario.id }}">Eliminar comentario</button>
+
+                                        <div class="confirmacionEliminarComentario" id="confirmacionEliminarComentario-{{ comentario.id }}">
+                                            <b>Estas seguro?</b>
+                                            <button onclick="eliminarComentario('{{ video.url | urlencode }}','{{ comentario.id }}')">Si</button>
+                                            <button onclick="mostrarConfirmacionEliminarComentario('{{ comentario.id }}');">No</button>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                </div>
+                <hr>
+            </ul>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p id="noVideos"><b>No hay videos.</b></p>
+{% endif %}
+{% block errorMessages %}
+    {% include "errorMessages.html" %}
+{% endblock %}
+</body>
+</html>

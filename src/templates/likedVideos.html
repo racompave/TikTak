@@ -1,0 +1,26 @@
+<!-- Esta es la vista con los videos que le gustan al usuario logueado en la plataforma. Simplemente muestra la lista
+de videos con todos los videos que le gustan. Si indicamos que un video no nos gusta en esta vista, ese video desaparecerá
+del DOM debido a que no tendría sentido mantenerlo-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TikTak: Videos que me gustan</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% block cabecera %}
+        {% include "cabecera.html" %}
+    {% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<input type="hidden" id="likedVideos" value="true">
+<div id="dvLikedVideos">
+     {% block videosList %}
+        {% include "videosList.html" %}
+     {% endblock %}
+</div>
+</body>
+</html>

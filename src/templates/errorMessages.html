@@ -1,0 +1,167 @@
+<!-- Este fragmento de HTML se utiliza para ser incluido en las distintas vistas
+de la aplicación para realizar la gestión de errores. Incluye varias funciones de validación y un div donde se generarán
+los mensajes de error-->
+
+<script>
+    /* Mantiene el div de mensajes de error invisible */
+
+    function hideError(){
+        const dvAnswer = document.getElementById( "dvError" );
+        dvAnswer.innerHTML = "";
+        dvAnswer.style.display = "none";
+    }
+
+     /*Para mostrar los mensajes de error cambiamos su visibilidad a "block" */
+
+    function showError(msg){
+        const dvError = document.getElementById( "dvError" );
+        dvError.innerHTML = "<p>ERROR: " + msg + "</p>";
+        dvError.style.display = "block";
+    }
+
+     /* Función que permite validar los datos introducidos al loguearse.
+     Obtiene por id los campos email y contraseña y quita los espacios iniciales y finales con trim().
+     Si se detecta que tienen longitud 0 (el usuario los ha dejado en blanco) salta
+     el correspondiente error avisando de ello.*/
+
+    function validateLogin(){
+            let toret = false;
+            const demail = document.getElementById("email");
+            const dpassword = document.getElementById("password");
+
+            hideError();
+
+            let email = demail.value.trim();
+            let password = dpassword.value.trim();
+
+            if(email.length === 0 || password.length === 0 ){
+              showError("debe introducir un email y contraseña.");
+            }
+            else{
+              toret = true;
+            }
+            return toret;
+    }
+
+     /* Función que permite validar los datos introducidos al registrarse.
+      Obtiene por id los campos email, contraseña y repetición de contraseña, quita
+      los espacios en blanco iniciales y finales. Si detecta que están en blanco salta un error informando
+      de que deben rellenarse. Por medio de una expresión regular comprobamos si el email
+      introducido es válido. También saltará error si se detecta que la repetición de contraseña
+      no coincide con la contraseña introducida.*/
+
+    function validateRegister(){
+            let toret = false;
+            const demail = document.getElementById("email");
+            const dpassword = document.getElementById("password");
+            const dpassword2 = document.getElementById("password2");
+
+            hideError();
+
+            let email = demail.value.trim();
+            let password = dpassword.value.trim();
+            let password2 = dpassword2.value.trim();
+
+            var emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+            var emailResult = emailRegEx.test(email)
+
+            if(email.length === 0 || password.length === 0 || password2.length === 0 ){
+              showError("debe rellenar todos los campos.");
+            }
+            else if(emailResult == false){
+              showError("debes introducir un email válido.");
+            }
+            else if(password !== password2){
+              showError("las contraseñas no coinciden!");
+            }
+            else{
+              toret = true;
+            }
+            return toret;
+
+    }
+
+     /* Función que permite validar añadir un video a la plataforma. Se recogen mediante id
+    los campos descripción y url del video. Se les quita los espacios iniciales y finales. Si se han dejado en blanco
+    salta el correspondiente error. Por medio de una expresión regular se comprueba si la URL introducida
+    es una URL valida para un video (sólo se aceptara URLs de videos pertenecientes a las plataformas YouTube y DailyMotion).
+    Además, si el campo descripción no es lo suficientemente extenso también saltará un error*/
+
+    function validateAddVideo(){
+        let toret = false;
+        const ddescription = document.getElementById("description");
+        const durl = document.getElementById("url");
+
+        hideError();
+
+        let description = ddescription.value.trim();
+        let url = durl.value.trim();
+
+        var urlRegEx = /^https:\/\/www.youtube.com\/watch\?v=|^https:\/\/www.dailymotion.com\/video\//;
+
+        var urlResult = urlRegEx.test(url);
+
+        if(description.length === 0 || url.length === 0){
+          showError("debes añadir una url y una descripción!");
+        }
+        else if(urlResult == false){
+          showError("debes añadir una url valida perteneciente a un video de YouTube o DailyMotion");
+        }
+        else if(description.length < 20){
+          showError("añade una descripción más larga al video!");
+        }
+        else{
+          toret = true;
+        }
+        return toret;
+    }
+
+     /* Función que permite validar la publicación de un comentario en un video por parte del usuario. Se
+     obtiene el comentario mediante id. Se borran los espacios en blanco iniciales y finales. Si se detecta que el usuario quiere publicar
+     el comentario sin haber escrito nada, saltará un error. Si ha introducido texto, se ejecutará la función
+     que añade el comentario a base de datos además de añadir el comentario al propio DOM y se devuelve true
+     (esta función está en la plantilla de videosList.html, pero podemos usarla desde aquí ya que en videosList.html se incluye la plantilla
+     errorMessages.html)*/
+
+    function validateAddComment(encodedUrl){
+        let toret = false;
+        const dcomentario = document.getElementById(`comentario-${encodedUrl}`);
+
+        hideError();
+
+        let comentario = dcomentario.value.trim();
+
+
+            if(comentario.length === 0){
+              showError("debes escribir algo para publicarlo!");
+            }
+            else{
+              toret = true;
+              comentarVideo(`${encodedUrl}`);
+            }
+            return toret;
+    }
+
+</script>
+
+
+<div id="dvError">
+        {% with error_messages = get_flashed_messages() %}
+            {% if error_messages %}
+                {% for message in error_messages %}
+                    {{ message }}
+                {% endfor %}
+            <script>
+                /*Esto nos permite gestionar de manera correcta los "flashed messages" de error, manteniendolos
+                escondidos mediante CSS, y cuando se detecta que han llegado "flashed messages"
+                se cambia su visibilidad a block*/
+
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const dvError = document.getElementById('dvError');
+                dvError.style.display = 'block';
+            });
+            </script>
+            {% endif %}
+        {% endwith %}
+</div>

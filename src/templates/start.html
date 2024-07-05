@@ -1,0 +1,40 @@
+<!-- Esta es la pantalla a la que accederá el usuario nada más loguearse en la plataforma, en la lista de videos mostrada
+podremos encontrar los 10 últimos videos añadidos-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>TikTak: Inicio</title>
+    <script>
+        /*Esto nos permite recargar esta página con el fin de encontrarnos siempre
+         con la versión actualizada de la misma si el usuario decide navegar hacia ella
+         dando hacia atrás en el histórico*/
+
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        if (performance.navigation.type === performance.navigation.TYPE_BACK_FORWARD) {
+            window.location.reload();
+        }
+    </script>
+</head>
+<body>
+{% block cabecera %}
+    {% include "cabecera.html" %}
+{% endblock %}
+    {% block menu %}
+        {% include "menu.html" %}
+    {% endblock %}
+<div id="dvUltimosVideos">
+     {% block videosList %}
+        {% include "videosList.html" %}
+     {% endblock %}
+</div>
+</body>
+</html>

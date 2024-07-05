@@ -1,0 +1,47 @@
+<!-- Esta es la vista inicial de la plataforma. Será lo primero que el usuario vea nada más
+acceder a la plataforma. En ella tenemos un formulario con el que loguearnos y poder hacer
+uso de la plataforma y otro form que nos redirigirá al formulario de registro.-->
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset ="utf-8" />
+      <title>TikTak</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    {% block cabeceraNoLogin %}
+        {% include "cabeceraNoLogin.html" %}
+    {% endblock %}
+
+    <form class ="loginForm" id="login"
+          action="/login"
+          onSubmit="return validateLogin();"
+          method="post">
+
+    Email : <input type="text"
+                    name="email"
+                    id="email"
+                    size="10"
+                    placeholder="email..."
+             />
+
+    Contraseña: <input type="password"
+                    name="password"
+                    id="password"
+                    size="10"
+                    placeholder="contraseña..."
+             />
+    <input type="submit" value="Loguearse">
+    </form>
+
+    <form id="register" action="/register" method="get">
+    <h2>¿No tienes cuenta? Regístrate aquí!</h2>
+    <input type="submit" value="Registrarse">
+    </form>
+    {% block errorMessages %}
+        {% include "errorMessages.html" %}
+    {% endblock %}
+  </body>
+</html>
